@@ -20,11 +20,11 @@ from config.views import links
 from .custom_site import custom_site
 
 urlpatterns = [
-    path('super_admin/', admin.site.urls),
-    path('admin/', custom_site.urls),
-    path('',post_list),
-    path('category/<int:category_id>/',post_list),
-    path('tag/<int:tag_id>/',post_list),
-    path('post/<int:post_id>/',post_detail),
-    path('links/',links),
+    path('super_admin/', admin.site.urls,name='super-admin'),
+    path('admin/', custom_site.urls,name='admin'),
+    path('',post_list,name='index'),
+    path('category/<int:category_id>/',post_list,name='category-list'),
+    path('tag/<int:tag_id>/',post_list,name='tag-list'),
+    path('post/<int:post_id>/',post_detail,name='post-detail'),
+    path('links/',links,name='links'),
 ]
