@@ -36,6 +36,10 @@ INSTALLED_APPS = [
     'config.apps.ConfigConfig',
     'comment.apps.CommentConfig',
 
+    'xadmin',
+    'crispy_forms',
+    'reversion',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -130,3 +134,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'themes', THEME, "static"),
 ]
+
+XADMIN_TITLE='Typeidea后台'
+XADMIN_FOOTER_TITLE='power by example.com'
