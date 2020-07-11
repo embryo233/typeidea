@@ -1,5 +1,5 @@
-<ul class="list-group">
+<ul>
 {% for post in posts %}
-<li class="list-group-item"><a href="{% url 'post-detail' post.id %}">{{ post.title }}</a></li>
+<li><a href="{% url 'post-detail' post.id %}">{{ post.title }}</a></li>
 {% endfor %}
 </ul>

@@ -1,3 +1,4 @@
+from mistune import markdown
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db import models
@@ -94,10 +95,11 @@ class Post(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        if self.is_md:
-            self.content_html = mistune.markdown(self.content)
-        else:
-            self.content_html = self.content
+        self.content_html = markdown(self.content)
+        #if self.is_md:
+        #    self.content_html = markdown(self.content)
+        #else:
+        #    self.content_html = self.content
         super().save(*args, **kwargs)
 
     @staticmethod
