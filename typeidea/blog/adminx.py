@@ -3,14 +3,16 @@ from xadmin.layout import Row,Fieldset
 from xadmin.filters import manager
 from xadmin.filters import RelatedFieldListFilter
 from xadmin.layout import Row, Fieldset, Container
+from xadmin.filters import MultiSelectFieldListFilter
 
 from django.contrib.admin.models import LogEntry
 #from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
+from django.conf import settings
 
 from .models import Post,Category,Tag
-from .adminforms import PostAdminForm
+from .adminxforms import PostAdminForm
 from typeidea.base_adminx import BaseOwnerAdmin
 #from typeidea.custom_site import custom_site
 
@@ -30,6 +32,9 @@ class CategoryAdmin(BaseOwnerAdmin):
     inlines=[PostInline,]
     list_display=('name','owner','status','is_nav','created_time','post_count')
     fields=('name','status','is_nav')
+    search_fields=['name','post__title']
+    relfield_style = 'fk-ajax'
+
 
     def post_count(self,obj):
         return obj.post_set.count()
@@ -39,6 +44,9 @@ class CategoryAdmin(BaseOwnerAdmin):
 class TagAdmin(BaseOwnerAdmin):
     list_display=('name','status','created_time')
     fields=('name','status')
+    search_fields=['name','post__title']
+    relfield_style = 'fk-ajax'
+
 
 class CategoryOwnerFilter(RelatedFieldListFilter):
     @classmethod
@@ -48,20 +56,40 @@ class CategoryOwnerFilter(RelatedFieldListFilter):
         super().__init__(field,request,params,model,admin_view,field_path)
         delf.lookup_choices=Catgory.objects.filter(owner=request.user).values_list('id','name')
 
+class TagOwnerFilter(RelatedFieldListFilter):
+    @classmethod
+    def test(cls,field,request,params,model,admin_view,field_path):
+        return field.name=='tag'
+    def __init__(self,field,request,params,model,admin_view,field_path):
+        super().__init__(field,request,params,model,admin_view,field_path)
+        delf.lookup_choices=Tag.objects.filter(owner=request.user).values_list('id','name')
+
+
 manager.register(CategoryOwnerFilter,take_priority=True)
 
 @xadmin.sites.register(Post)
 class PostAdmin(BaseOwnerAdmin):
     form=PostAdminForm
     list_display=[
-        'title','category','status',
+        'title','category','tag','status',
         'created_time','owner','operator'
     ]
+    relfield_style = 'fk-ajax'
+
     list_display_links=[]
 
     #list_filter=[CategoryOwnerFilter]
-    list_filter=['category']
-    search_fields=['title','category__name']
+
+    list_filter=[
+       'category',
+       ('tag', MultiSelectFieldListFilter)
+       #'tag'
+    ]
+    search_fields=[
+        'title',
+        'category__name',
+        'tag__name'
+    ]
 
     actions_on_top=True
     actions_on_bottom=True
@@ -78,28 +106,27 @@ class PostAdmin(BaseOwnerAdmin):
     #    'tag',
     #)
 
-    Fieldsets = (
-        ('基础配置', {
-            'description': '基础配置描述',
-            'fields': (
-                ('title', 'category'),
-                'status',
-            ),
-        }),
-        ('内容', {
-            'fields': (
-                'desc',
-                'content',
-            ),
-        }),
-        ('额外信息', {
-            'classes': ('wide',),
-            'fields': ('tag', ),
-        })
+    form_layout = (
+        Fieldset(
+            '基础信息',
+            Row("title", "category"),
+            'status',
+            'tag',
+        ),
+        Fieldset(
+            '内容信息',
+            'desc',
+            'is_md',
+            'content_ck',
+            'content_md',
+            'content',
+        )
     )
 
-    filter_horizontal = ('tag', )
+
+    #filter_horizontal = ('tag', )
     #filter_vertical = ('tag', )
+    #style_fields = {'tag': 'm2m_transfer'}
 
     def operator(self,obj):
         return format_html(
@@ -126,5 +153,5 @@ class PostAdmin(BaseOwnerAdmin):
     #自定义CSS JS 放在/xadmin/static/xadmin/对应的目录下 并且以xadmin.开头
     #def get_media(self):
     #    media = super().get_media()
-    #    media += self.vendor('xadmin.bootstrap.min.js', 'xadmin.bootstrap.min.css')
+    #    #media += self.vendor('xadmin.select2.min.js')
     #    return media

@@ -98,10 +98,10 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         self.content_html = markdown(self.content)
-        #if self.is_md:
-        #    self.content_html = markdown(self.content)
-        #else:
-        #    self.content_html = self.content
+        if self.is_md:
+            self.content_html = markdown(self.content)
+        else:
+            self.content_html = self.content
         super().save(*args, **kwargs)
 
     @staticmethod

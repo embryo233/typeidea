@@ -15,9 +15,11 @@ Including another URLconf
 """
 import xadmin
 
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path,re_path
+from django.urls import path,re_path,include
 from django.contrib.sitemaps import views as sitemap_views
+from django.conf.urls.static import static
 
 from blog.views import (
     post_list,post_detail,
@@ -29,6 +31,7 @@ from comment.views import CommentView
 from .custom_site import custom_site
 from blog.rss import LatestPostFeed
 from blog.sitemap import PostSitemap
+from .autocomplete import CategoryAutocomplete,TagAutocomplete
 
 
 urlpatterns = [
@@ -45,4 +48,7 @@ urlpatterns = [
     path('comment/',CommentView.as_view(),name='comment'),
     re_path(r'^rss|feed/', LatestPostFeed(), name='rss'),
     re_path(r'^sitemap\.xml$', sitemap_views.sitemap, {'sitemaps': {'posts': PostSitemap}}),
-]
+    path('category-autocomplete/', CategoryAutocomplete.as_view(), name='category-autocomplete'),
+    path('tag-autocomplete/', TagAutocomplete.as_view(), name='tag-autocomplete'),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+    ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -5,6 +5,7 @@ from django.utils.html import format_html
 
 from .models import Post,Category,Tag
 from .adminforms import PostAdminForm
+
 from typeidea.base_admin import BaseOwnerAdmin
 from typeidea.custom_site import custom_site
 # Register your models here.
@@ -19,6 +20,7 @@ class CategoryAdmin(BaseOwnerAdmin):
     inlines=[PostInline,]
     list_display=('name','owner','status','is_nav','created_time','post_count')
     fields=('name','status','is_nav')
+    search_fields = ('name', 'id')
 
     def post_count(self,obj):
         return obj.post_set.count()
@@ -28,6 +30,7 @@ class CategoryAdmin(BaseOwnerAdmin):
 class TagAdmin(BaseOwnerAdmin):
     list_display=('name','status','created_time')
     fields=('name','status')
+    search_fields = ('name', 'id')
 
 class CategoryOwnerFilter(admin.SimpleListFilter):
     ''' 自定义过滤器只展示当前用户分类 '''
@@ -53,6 +56,7 @@ class PostAdmin(BaseOwnerAdmin):
     list_display_links=[]
 
     list_filter=[CategoryOwnerFilter]
+    autocomplete_fields = ['category','tag']
     search_fields=['title','category__name']
 
     actions_on_top=True
@@ -80,8 +84,12 @@ class PostAdmin(BaseOwnerAdmin):
         }),
         ('内容', {
             'fields': (
-                'desc',
-                'content',
+            'desc',
+            'is_md',
+            'content_ck',
+            'content_md',
+            'content',
+
             ),
         }),
         ('额外信息', {
