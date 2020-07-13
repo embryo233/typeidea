@@ -14,7 +14,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 import xadmin
-
+from rest_framework.routers import DefaultRouter
+from rest_framework.documentation import include_docs_urls
 from django.conf import settings
 from django.contrib import admin
 from django.urls import path,re_path,include
@@ -32,7 +33,17 @@ from .custom_site import custom_site
 from blog.rss import LatestPostFeed
 from blog.sitemap import PostSitemap
 from .autocomplete import CategoryAutocomplete,TagAutocomplete
+from blog.apis import PostViewSet,CategoryViewSet
 
+router=DefaultRouter()
+router.register(r'post',PostViewSet,basename='api-post')
+router.register(r'category',CategoryViewSet,basename='api-category')
+
+'''
+url(r'^', include(router.urls)),
+url(r'^api/', include((router.urls, 'app_name'))),
+url(r'^api/', include((router.urls, 'app_name'), namespace='instance_name')),
+'''
 
 urlpatterns = [
     path('super_admin/', admin.site.urls,name='super-admin'),
@@ -51,4 +62,15 @@ urlpatterns = [
     path('category-autocomplete/', CategoryAutocomplete.as_view(), name='category-autocomplete'),
     path('tag-autocomplete/', TagAutocomplete.as_view(), name='tag-autocomplete'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    #path('api/post/',post_list,name='post-list'),
+    #path('api/post/',PostList.as_view(),name='post-list'),
+
+    #path('api/', include(router.urls,namespace='api')),无效
+
+    path('api/', include((router.urls, 'blog'), namespace='api')),
+    #path('api/', include((router.urls, 'blog'))),
+    #path('api/', include(router.urls)),
+
+    path('api/docs/',include_docs_urls(title='typeidea apis')),
+
     ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
