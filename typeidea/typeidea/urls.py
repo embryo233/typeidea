@@ -49,6 +49,7 @@ urlpatterns = [
     path('super_admin/', admin.site.urls,name='super-admin'),
     path('admin/', custom_site.urls,name='admin'),
     path('xadmin/', xadmin.site.urls,name='xadmin'),
+
     path('',IndexView.as_view(),name='index'),
     path('category/<int:category_id>/',CategoryView.as_view(),name='category-list'),
     path('tag/<int:tag_id>/',TagView.as_view(),name='tag-list'),
