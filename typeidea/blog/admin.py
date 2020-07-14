@@ -108,11 +108,11 @@ class PostAdmin(BaseOwnerAdmin):
         )
     operator.short_description='操作'
 
-    class Media:
-        css = {
-            'all': ("https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css", ),
-        }
-        js = ('https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js', )
+    #class Media:
+    #    css = {
+    #        'all': ("https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css", ),
+    #    }
+    #    js = ('https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/js/bootstrap.min.js', )
 
 @admin.register(LogEntry, site=custom_site)
 class LogEntryAdmin(admin.ModelAdmin):

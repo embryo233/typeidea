@@ -4,6 +4,7 @@ from django.utils.functional import cached_property
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db import models
+from django.db.models import Avg,Max,Min,Count,Sum  #   引入函数
 
 
 class Category(models.Model):
@@ -29,15 +30,20 @@ class Category(models.Model):
     @classmethod
     def get_navs(cls):
         categories=cls.objects.filter(status=cls.STATUS_NORMAL)
-        nav_categories=[]
-        normal_categories=[]
-        #nav_categories=categories.filter(is_nav=True)
-        #normal_categories=categories.filter(is_nav=False)
-        for cate in categories:
-            if cate.is_nav:
-                nav_categories.append(cate)
-            else:
-                normal_categories.append(cate)
+        #categories=Category.objects.filter(status=cls.STATUS_NORMAL).annotate(c=Count('post__title'))
+
+        #nav_categories=[]
+        #normal_categories=[]
+        nav_categories=categories.filter(is_nav=True)
+        normal_categories=categories.filter(is_nav=False).annotate(c=Count('post__id'))[:100]
+
+        #for cate in categories:
+        #    if cate.is_nav:
+        #        nav_categories.append(cate)
+        #    else:
+        #        normal_categories.append(cate)
+        #        if len(normal_categories)>=100:
+        #            break
         return {
             'navs':nav_categories,
             'categories':normal_categories,
