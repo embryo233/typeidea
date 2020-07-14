@@ -113,12 +113,12 @@ vendors = {
     "select": {
         "css": {
             "dev": [
-                "xadmin/vendor/select2/css/select2.css",
+                #"xadmin/vendor/select2/css/select2.css",
                 "xadmin/vendor/selectize/css/selectize.css",
                 "xadmin/vendor/selectize/css/selectize.bootstrap3.css"
             ],
             "production": [
-                "xadmin/vendor/select2/css/select2.min.css",
+                #"xadmin/vendor/select2/css/select2.min.css",
                 "xadmin/vendor/selectize/css/selectize.css",
                 "xadmin/vendor/selectize/css/selectize.bootstrap3.css"
             ]
@@ -126,13 +126,13 @@ vendors = {
         "js": {
             "dev": [
                 "xadmin/vendor/selectize/js/selectize.js",
-                "xadmin/vendor/select2/js/select2.js",
-                "xadmin/vendor/select2/js/i18n/%(lang)s.js"
+                #"xadmin/vendor/select2/js/select2.js",
+                #"xadmin/vendor/select2/js/i18n/%(lang)s.js"
             ],
             "production": [
                 "xadmin/vendor/selectize/js/selectize.min.js",
-                "xadmin/vendor/select2/js/select2.min.js",
-                "xadmin/vendor/select2/js/i18n/%(lang)s.js"
+                #"xadmin/vendor/select2/js/select2.min.js",
+                #"xadmin/vendor/select2/js/i18n/%(lang)s.js"
             ]
         }
     },

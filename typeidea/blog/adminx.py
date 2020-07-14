@@ -45,7 +45,7 @@ class TagAdmin(BaseOwnerAdmin):
     list_display=('name','status','created_time')
     fields=('name','status')
     search_fields=['name','post__title']
-    relfield_style = 'fk-ajax'
+    #relfield_style = 'fk-ajax'
 
 
 class CategoryOwnerFilter(RelatedFieldListFilter):
@@ -74,8 +74,7 @@ class PostAdmin(BaseOwnerAdmin):
         'title','category','tag','status',
         'created_time','owner','operator'
     ]
-    relfield_style = 'fk-ajax'
-
+    
     list_display_links=[]
 
     #list_filter=[CategoryOwnerFilter]
