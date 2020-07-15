@@ -1,9 +1,10 @@
 import xadmin
 from xadmin.layout import Row,Fieldset
-from xadmin.filters import manager
-from xadmin.filters import RelatedFieldListFilter
+from xadmin.filters import (
+    manager,ListFieldFilter,
+    RelatedFieldListFilter,MultiSelectFieldListFilter
+)
 from xadmin.layout import Row, Fieldset, Container
-from xadmin.filters import MultiSelectFieldListFilter
 
 from django.contrib.admin.models import LogEntry
 #from django.contrib import admin
@@ -24,12 +25,12 @@ class PostInline():
             Row('title','desc')
         )
     )
-    extra=3
+    extra=1
     model=Post
 
 @xadmin.sites.register(Category)
 class CategoryAdmin(BaseOwnerAdmin):
-    inlines=[PostInline,]
+    #inlines=[PostInline,]
     list_display=('name','owner','status','is_nav','created_time','post_count')
     fields=('name','status','is_nav')
     search_fields=['name','post__title']
@@ -47,25 +48,38 @@ class TagAdmin(BaseOwnerAdmin):
     search_fields=['name','post__title']
     #relfield_style = 'fk-ajax'
 
+#加上自定义过滤器后反而不是搜索框
+#class CategoryOwnerFilter(RelatedFieldListFilter):
+#
+#    @classmethod
+#    def test(cls, field, request, params, model, admin_view, field_path):
+#        return field.name == 'category'
+#
+#    def __init__(self, field, request, params, model, model_admin, field_path):
+#        super().__init__(field, request, params, model, model_admin, field_path)
+#        # 重新获取lookup_choices，根据owner过滤
+#        self.lookup_choices = Category.objects.filter(owner=request.user).values_list('id', 'name')
 
-class CategoryOwnerFilter(RelatedFieldListFilter):
+#manager.register(CategoryOwnerFilter, take_priority=True)
+
+class TagOwnerFilter(MultiSelectFieldListFilter):
+
     @classmethod
-    def test(cls,field,request,params,model,admin_view,field_path):
-        return field.name=='categpry'
-    def __init__(self,field,request,params,model,admin_view,field_path):
-        super().__init__(field,request,params,model,admin_view,field_path)
-        delf.lookup_choices=Catgory.objects.filter(owner=request.user).values_list('id','name')
+    def test(cls, field, request, params, model, admin_view, field_path):
+        return field.name == 'tag'
+        #return True
 
-class TagOwnerFilter(RelatedFieldListFilter):
-    @classmethod
-    def test(cls,field,request,params,model,admin_view,field_path):
-        return field.name=='tag'
-    def __init__(self,field,request,params,model,admin_view,field_path):
-        super().__init__(field,request,params,model,admin_view,field_path)
-        delf.lookup_choices=Tag.objects.filter(owner=request.user).values_list('id','name')
+    def __init__(self, field, request, params, model, model_admin, field_path,field_order_by=None,field_limit=None,sort_key=None,cache_config=None):
+        super().__init__(field, request, params, model, model_admin, field_path,field_order_by,field_limit,sort_key,cache_config)
+        queryset = self.admin_view.queryset().exclude(**{"%s__isnull" % field_path: True}).values_list(field_path, flat=True).order_by(field_path).distinct()
+        for it in queryset:
+            print(it)
+        self.lookup_choices = [str(it) for it in queryset.values_list('tag__name', flat=True) if str(it).strip() != ""]
 
 
-manager.register(CategoryOwnerFilter,take_priority=True)
+
+
+manager.register(TagOwnerFilter, take_priority=True)
 
 @xadmin.sites.register(Post)
 class PostAdmin(BaseOwnerAdmin):
@@ -81,8 +95,9 @@ class PostAdmin(BaseOwnerAdmin):
 
     list_filter=[
        'category',
-       ('tag', MultiSelectFieldListFilter)
-       #'tag'
+       'tag',
+       #('category', MultiSelectFieldListFilter),
+       #('tag', MultiSelectFieldListFilter),
     ]
     search_fields=[
         'title',

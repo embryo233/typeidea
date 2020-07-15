@@ -149,3 +149,4 @@ class Post(models.Model):
     @cached_property
     def tags(self):
         return ','.join(self.tag.values_list('name',flat=True))
+    tags.short_description='标签'

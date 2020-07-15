@@ -39,25 +39,42 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
     parameter_name='owner_category'
 
     def lookups(self,request,model_admin):
-        return Category.objects.filter(owner=request.user).values_list('id','name')
+        #return Category.objects.filter(owner=request.user).values_list('id','name')
+        return Post.objects.filter(owner=request.user).values_list('category__id','category__name').order_by('category').distinct()
+
     def queryset(self,request,queryset):
         category_id=self.value()
         if category_id:
             return queryset.filter(category_id=self.value())
         return queryset
 
+class TagOwnerFilter(admin.SimpleListFilter):
+    ''' 自定义过滤器只展示当前用户分类 '''
+
+    title='标签过滤器'
+    parameter_name='owner_tag'
+
+    def lookups(self,request,model_admin):
+        return Post.objects.filter(owner=request.user).values_list('tag__id','tag__name').order_by('tag').distinct()
+
+    def queryset(self,request,queryset):
+        tag_id=self.value()
+        if tag_id:
+            return queryset.filter(tag__id=self.value())
+        return queryset
+
 @admin.register(Post,site=custom_site)
 class PostAdmin(BaseOwnerAdmin):
     form=PostAdminForm
     list_display=[
-        'title','category','status',
+        'title','category','tags','status',
         'created_time','owner','operator'
     ]
     list_display_links=[]
 
-    list_filter=[CategoryOwnerFilter]
+    list_filter=[CategoryOwnerFilter,TagOwnerFilter]
     autocomplete_fields = ['category','tag']
-    search_fields=['title','category__name']
+    search_fields=['title','category__name','tag__name']
 
     actions_on_top=True
     actions_on_bottom=True
