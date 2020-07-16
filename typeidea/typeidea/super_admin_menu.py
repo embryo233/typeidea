@@ -3,7 +3,7 @@ This file was generated with the custommenu management command, it contains
 the classes for the admin menu, you can customize this class as you want.
 
 To activate your custom menu add the following to your settings.py::
-    ADMIN_TOOLS_MENU = 'typeidea.menu.CustomMenu'
+    ADMIN_TOOLS_MENU = 'typeidea.super_admin_menu.CustomMenu'
 """
 
 try:
@@ -31,31 +31,7 @@ class CustomMenu(Menu):
             items.AppList(
                 _('Administration'),
                 models=('django.contrib.*',)
-            ),
-            items.ModelList(
-                'Blog app menu',
-                [
-                    'blog.models.Post',
-                    'blog.models.Category',
-                    'blog.models.Tag',
-                    'django.contrib.auth.*'
-                ]
-            ),
-            items.ModelList(
-                'Config app menu',
-                [
-                    'config.models.*',
-                    'django.contrib.auth.*'
-                ]
-            ),
-            items.ModelList(
-                'Comment app menu',
-                [
-                    'comment.models.*',
-                    'django.contrib.auth.*'
-                ]
-            ),
-
+            )
         ]
 
     def init_with_context(self, context):

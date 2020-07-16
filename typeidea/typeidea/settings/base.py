@@ -184,5 +184,17 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 2,
 }
-ADMIN_TOOLS_INDEX_DASHBOARD = 'typeidea.dashboard.CustomIndexDashboard'
-ADMIN_TOOLS_MENU = 'typeidea.menu.CustomMenu'
+
+#ADMIN_TOOLS_INDEX_DASHBOARD = 'typeidea.dashboard.CustomIndexDashboard'
+#ADMIN_TOOLS_MENU = 'typeidea.menu.CustomMenu'
+
+ADMIN_TOOLS_INDEX_DASHBOARD = {
+    'django.contrib.admin.site': 'typeidea.admin_dashboard.CustomIndexDashboard',
+    'typeidea.custom_site.custom_site': 'typeidea.admin_dashboard.CustomIndexDashboard',
+}
+
+ADMIN_TOOLS_MENU = {
+    'django.contrib.admin.site': 'typeidea.admin_menu.CustomMenu',
+    'typeidea.custom_site.custom_site': 'typeidea.super_admin_menu.CustomMenu',
+}
+

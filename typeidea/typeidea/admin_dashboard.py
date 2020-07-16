@@ -4,10 +4,10 @@ contains the two classes for the main dashboard and app index dashboard.
 You can customize these classes as you want.
 
 To activate your index dashboard add the following to your settings.py::
-    ADMIN_TOOLS_INDEX_DASHBOARD = 'typeidea.dashboard.CustomIndexDashboard'
+    ADMIN_TOOLS_INDEX_DASHBOARD = 'typeidea.admin_dashboard.CustomIndexDashboard'
 
 And to activate the app index dashboard::
-    ADMIN_TOOLS_APP_INDEX_DASHBOARD = 'typeidea.dashboard.CustomAppIndexDashboard'
+    ADMIN_TOOLS_APP_INDEX_DASHBOARD = 'typeidea.admin_dashboard.CustomAppIndexDashboard'
 """
 
 from django.utils.translation import ugettext_lazy as _
@@ -44,19 +44,13 @@ class CustomIndexDashboard(Dashboard):
         # append an app list module for "Applications"
         self.children.append(modules.AppList(
             _('Applications'),
-            exclude=('django.contrib.*','blog','config','comment'),
+            exclude=('django.contrib.*',),
         ))
 
         # append an app list module for "Administration"
         self.children.append(modules.AppList(
             _('Administration'),
             models=('django.contrib.*',),
-        ))
-
-        self.children.append(modules.ModelList(
-            'Test1',
-            #['django.contrib.auth.*', '*.Site', '*.Foo'],
-            ['django.contrib.auth.models.*', 'typeidea.*']
         ))
 
         # append a recent actions module
@@ -88,27 +82,6 @@ class CustomIndexDashboard(Dashboard):
                     'url': 'irc://irc.freenode.net/django',
                     'external': True,
                 },
-            ]
-        ))
-        self.children.append(modules.Group(
-            title='Test group',
-            children=[
-                modules.ModelList(
-                    'Tab 1',
-                    ['django.contrib.*']
-                ),
-                modules.ModelList(
-                    'Tab 2',
-                    ['typeidea.*']
-                ),
-                modules.ModelList(
-                    'Tab 2',
-                    ['blog.*']
-                ),
-                modules.ModelList(
-                    'Tab 2',
-                    ['config.*']
-                ),
             ]
         ))
 
