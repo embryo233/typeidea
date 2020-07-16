@@ -14,7 +14,7 @@ import os
 import sys
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0,os.path.join(os.path.dirname(BASE_DIR),'extra_apps'))
+#sys.path.insert(0,os.path.join(os.path.dirname(BASE_DIR),'extra_apps'))
 
 
 # Quick-start development settings - unsuitable for production
@@ -32,7 +32,11 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'bootstrap_admin',
+    'admin_tools',
+    'admin_tools.theming',
+    'admin_tools.menu',
+    'admin_tools.dashboard',
+    #'bootstrap_admin',
 
     'dal',
     'dal_select2',
@@ -40,9 +44,9 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
 
-    'xadmin',
-    'crispy_forms',
-    'reversion',
+    #'xadmin',
+    #'crispy_forms',
+    #'reversion',
 
     'rest_framework',
 
@@ -80,13 +84,18 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR,'themes',THEME,'templates')],
-        'APP_DIRS': True,
+        'APP_DIRS': False,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'admin_tools.template_loaders.Loader',
             ],
         },
     },
@@ -142,11 +151,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'themes', THEME, "static"),
 ]
-
+STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+)
 XADMIN_TITLE='Typeidea后台'
 XADMIN_FOOTER_TITLE='power by example.com'
 
@@ -170,3 +184,5 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 2,
 }
+ADMIN_TOOLS_INDEX_DASHBOARD = 'typeidea.dashboard.CustomIndexDashboard'
+ADMIN_TOOLS_MENU = 'typeidea.menu.CustomMenu'

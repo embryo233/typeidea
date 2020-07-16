@@ -46,9 +46,10 @@ url(r'^api/', include((router.urls, 'app_name'), namespace='instance_name')),
 '''
 
 urlpatterns = [
+    re_path(r'^admin_tools/', include('admin_tools.urls')),
     path('super_admin/', admin.site.urls,name='super-admin'),
     path('admin/', custom_site.urls,name='admin'),
-    path('xadmin/', xadmin.site.urls,name='xadmin'),
+    #path('xadmin/', xadmin.site.urls,name='xadmin'),
 
     path('',IndexView.as_view(),name='index'),
     path('category/<int:category_id>/',CategoryView.as_view(),name='category-list'),
