@@ -189,12 +189,16 @@ REST_FRAMEWORK = {
 #ADMIN_TOOLS_MENU = 'typeidea.menu.CustomMenu'
 
 ADMIN_TOOLS_INDEX_DASHBOARD = {
-    'django.contrib.admin.site': 'typeidea.admin_dashboard.CustomIndexDashboard',
+    'django.contrib.admin.site': 'typeidea.super_admin_dashboard.CustomIndexDashboard',
     'typeidea.custom_site.custom_site': 'typeidea.admin_dashboard.CustomIndexDashboard',
 }
 
+ADMIN_TOOLS_APP_INDEX_DASHBOARD = {
+    'django.contrib.admin.site': 'typeidea.super_admin_dashboard.CustomAppIndexDashboard',
+    'typeidea.custom_site.custom_site': 'typeidea.admin_dashboard.CustomAppIndexDashboard',
+}
 ADMIN_TOOLS_MENU = {
-    'django.contrib.admin.site': 'typeidea.admin_menu.CustomMenu',
-    'typeidea.custom_site.custom_site': 'typeidea.super_admin_menu.CustomMenu',
+    'django.contrib.admin.site': 'typeidea.super_admin_menu.CustomMenu',
+    'typeidea.custom_site.custom_site': 'typeidea.admin_menu.CustomMenu',
 }
 

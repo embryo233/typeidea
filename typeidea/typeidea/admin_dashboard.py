@@ -18,7 +18,7 @@ except ImportError:
 
 from admin_tools.dashboard import modules, Dashboard, AppIndexDashboard
 from admin_tools.utils import get_admin_site_name
-
+from .modules import MyRecentActions
 
 class CustomIndexDashboard(Dashboard):
     """
@@ -55,35 +55,43 @@ class CustomIndexDashboard(Dashboard):
 
         # append a recent actions module
         self.children.append(modules.RecentActions(_('Recent Actions'), 5))
+        #self.children.append(MyRecentActions(_('My Recent Actions'), 5))
 
         # append a feed module
+        #self.children.append(modules.Feed(
+        #    _('Latest Django News'),
+        #    feed_url='http://www.djangoproject.com/rss/weblog/',
+        #    limit=5
+        #))
+
+        request=context.get('request')
+        #print(request.build_absolute_uri('/feed/'))
         self.children.append(modules.Feed(
-            _('Latest Django News'),
-            feed_url='http://www.djangoproject.com/rss/weblog/',
+            _('Typeidea Posts'),
+            feed_url=request.build_absolute_uri('/feed/'),
             limit=5
         ))
-
         # append another link list module for "support".
-        self.children.append(modules.LinkList(
-            _('Support'),
-            children=[
-                {
-                    'title': _('Django documentation'),
-                    'url': 'http://docs.djangoproject.com/',
-                    'external': True,
-                },
-                {
-                    'title': _('Django "django-users" mailing list'),
-                    'url': 'http://groups.google.com/group/django-users',
-                    'external': True,
-                },
-                {
-                    'title': _('Django irc channel'),
-                    'url': 'irc://irc.freenode.net/django',
-                    'external': True,
-                },
-            ]
-        ))
+        #self.children.append(modules.LinkList(
+        #    _('Support'),
+        #    children=[
+        #        {
+        #            'title': _('Django documentation'),
+        #            'url': 'http://docs.djangoproject.com/',
+        #            'external': True,
+        #        },
+        #        {
+        #            'title': _('Django "django-users" mailing list'),
+        #            'url': 'http://groups.google.com/group/django-users',
+        #            'external': True,
+        #        },
+        #        {
+        #            'title': _('Django irc channel'),
+        #            'url': 'irc://irc.freenode.net/django',
+        #            'external': True,
+        #        },
+        #    ]
+        #))
 
 
 class CustomAppIndexDashboard(AppIndexDashboard):
@@ -97,11 +105,16 @@ class CustomAppIndexDashboard(AppIndexDashboard):
     def __init__(self, *args, **kwargs):
         AppIndexDashboard.__init__(self, *args, **kwargs)
 
-        # append a model list module and a recent actions module
+         #append a model list module and a recent actions module
         self.children += [
             modules.ModelList(self.app_title, self.models),
             modules.RecentActions(
                 _('Recent Actions'),
+                include_list=self.get_app_content_types(),
+                limit=5
+            ),
+            MyRecentActions(
+                _('最近操作'),
                 include_list=self.get_app_content_types(),
                 limit=5
             )
