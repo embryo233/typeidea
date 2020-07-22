@@ -21,6 +21,7 @@ from django.contrib import admin
 from django.urls import path,re_path,include
 from django.contrib.sitemaps import views as sitemap_views
 from django.conf.urls.static import static
+from django.views.decorators.cache import cache_page
 
 from blog.views import (
     post_list,post_detail,
@@ -59,7 +60,7 @@ urlpatterns = [
     path('links/',LinkListView.as_view(),name='links'),
     path('comment/',CommentView.as_view(),name='comment'),
     re_path(r'^rss|feed/', LatestPostFeed(), name='rss'),
-    re_path(r'^sitemap\.xml$', sitemap_views.sitemap, {'sitemaps': {'posts': PostSitemap}}),
+    re_path(r'^sitemap\.xml$',cache_page(60*20,key_prefix='sitemap_cache_')( sitemap_views.sitemap ), {'sitemaps': {'posts': PostSitemap}}),
     path('category-autocomplete/', CategoryAutocomplete.as_view(), name='category-autocomplete'),
     path('tag-autocomplete/', TagAutocomplete.as_view(), name='tag-autocomplete'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
