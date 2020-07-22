@@ -6,7 +6,6 @@ from django.core.cache import cache
 from django.db import models
 from django.db.models import Avg,Max,Min,Count,Sum  #   引入函数
 
-
 class Category(models.Model):
     STATUS_NORMAL = 1
     STATUS_DELETE = 0
