@@ -13,12 +13,14 @@ DATABASES = {
 }
 
 INSTALLED_APPS+=[
-    'debug_toolbar',
-    'pympler',
-    'debug_toolbar_line_profiler',
+    #'debug_toolbar',
+    #'pympler',
+    #'debug_toolbar_line_profiler',
+    'silk',
 ]
 MIDDLEWARE+=[
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
 #INTERNAL_IPS=['127.0.0.1']
@@ -29,7 +31,9 @@ INTERNAL_IPS=['192.168.11.100']
 #DEBUG_TOOLBAR_CONFIG = {
 #    "SHOW_TOOLBAR_CALLBACK" : show_toolbar,
 #}
-DEBUG_TOOLBAR_CONFIG = {'JQUERY_URL' : "https://cdn.bootcdn.net/ajax/libs/jquery/3.3.1/jquery.min.js"}
+DEBUG_TOOLBAR_CONFIG = {
+        'JQUERY_URL' : "https://cdn.bootcdn.net/ajax/libs/jquery/3.3.1/jquery.min.js",
+}
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.versions.VersionsPanel',
     'debug_toolbar.panels.timer.TimerPanel',
