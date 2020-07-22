@@ -5,19 +5,63 @@ from django.shortcuts import render,get_object_or_404
 from django.views.generic import DetailView,ListView
 from django.db.models import Q,F
 from django.core.cache import cache
+from django.template.loader import render_to_string
+
 
 from .models import Post,Tag,Category
 from config.models import SideBar
 # Create your views here.
 
+def content_html(self):
+    """ 通过直接渲染模板 """
+    from blog.models import Post  # 避免循环引用
+    from comment.models import Comment
+
+    result = ''
+    if self.display_type == self.DISPLAY_HTML:
+        result = self.content
+    elif self.display_type == self.DISPLAY_LATEST:
+        context = {
+            'posts': Post.latest_posts(with_related=False)
+        }
+        result = render_to_string('config/blocks/sidebar_posts.html', context)
+    elif self.display_type == self.DISPLAY_HOT:
+        context = {
+            'posts': Post.hot_posts()
+        }
+        result = render_to_string('config/blocks/sidebar_posts.html', context)
+    elif self.display_type == self.DISPLAY_COMMENT:
+        context = {
+            'comments': Comment.objects.filter(status=Comment.STATUS_NORMAL)
+        }
+        result = render_to_string('config/blocks/sidebar_comments.html', context)
+    return result
+
 class CommonViewMixin:
     def get_context_data(self,**kwargs):
         context=super().get_context_data(**kwargs)
+        
         context.update({
-            'sidebars':SideBar.get_all(),
+            'sidebars':self.get_sidebars(),
         })
+        #context.update({
+        #    'sidebars':SideBar.get_all(),
+        #})
         context.update(Category.get_navs())
         return context
+
+    def get_sidebars(self):
+        #view层处理Sidebar
+        #sidebars= []
+        #sidebars=SideBar.get_all()
+
+        #sidebars=SideBar.get_all()
+        sidebars=SideBar.objects.filter(status=SideBar.STATUS_SHOW)
+
+        for sidebar in sidebars:
+            sidebar.content_html=content_html(sidebar)
+
+        return sidebars;
 
 class IndexView(CommonViewMixin,ListView):
     queryset=Post.latest_posts()
