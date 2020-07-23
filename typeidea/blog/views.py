@@ -14,10 +14,13 @@ class CommonViewMixin:
     def get_context_data(self,**kwargs):
         context=super().get_context_data(**kwargs)
         context.update({
-            'sidebars':SideBar.get_all(),
+            'sidebars':self.get_sidebars(),
         })
         context.update(Category.get_navs())
         return context
+
+    def get_sidebars(self):
+        return SideBar.objects.filter(status=SideBar.STATUS_SHOW);
 
 class IndexView(CommonViewMixin,ListView):
     queryset=Post.latest_posts()

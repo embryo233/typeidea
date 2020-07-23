@@ -97,6 +97,9 @@ TEMPLATES = [
                 'django.template.loaders.app_directories.Loader',
                 'admin_tools.template_loaders.Loader',
             ],
+            'libraries': {  # Adding this section should work around the issue.
+                'staticfiles': 'django.templatetags.static',
+            },
         },
     },
 ]
