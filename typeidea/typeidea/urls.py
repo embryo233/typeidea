@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-import xadmin
+#import xadmin
 from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
 from django.conf import settings
@@ -34,6 +34,7 @@ from blog.rss import LatestPostFeed
 from blog.sitemap import PostSitemap
 from .autocomplete import CategoryAutocomplete,TagAutocomplete
 from blog.apis import PostViewSet,CategoryViewSet
+from django.views.decorators.cache import cache_page
 
 router=DefaultRouter()
 router.register(r'post',PostViewSet,basename='api-post')
@@ -60,7 +61,8 @@ urlpatterns = [
     path('links/',LinkListView.as_view(),name='links'),
     path('comment/',CommentView.as_view(),name='comment'),
     re_path(r'^rss|feed/', LatestPostFeed(), name='rss'),
-    re_path(r'^sitemap\.xml$', sitemap_views.sitemap, {'sitemaps': {'posts': PostSitemap}}),
+    #re_path(r'^sitemap\.xml$', sitemap_views.sitemap, {'sitemaps': {'posts': PostSitemap}}),
+    re_path(r'^sitemap\.xml$',cache_page(60*20,key_prefix='sitemap_cache_')( sitemap_views.sitemap ), {'sitemaps': {'posts': PostSitemap}}),
     path('category-autocomplete/', CategoryAutocomplete.as_view(), name='category-autocomplete'),
     path('tag-autocomplete/', TagAutocomplete.as_view(), name='tag-autocomplete'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
