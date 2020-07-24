@@ -22,8 +22,8 @@ setup(
     install_requires=[
         'django~=3.0.8',
         'django-admin-tools',
-        #'gunicorn==19.8.1',
-        #'supervisor==4.0.0dev0',
+        'gunicorn==20.0.4',
+        'supervisor==4.0.2',
 
         #从19.0开始，dependency_links过时 从pip18.1开始可在install_requires放置这些依赖 使用pip install .而不是python setup.py install
         #'xadmin @ git+https://github.com/vip68/xadmin_bugfix@3084bb334c372600052dc901bfe76d8190d290dc'
