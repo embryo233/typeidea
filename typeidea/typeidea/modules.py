@@ -6,7 +6,6 @@ from django.contrib.admin.utils import quote
 
 from django.urls import NoReverseMatch, reverse
 
-from .models import MyLogEntry
 from types import MethodType
 
 def get_admin_url(self):
@@ -85,10 +84,8 @@ class MyRecentActions(RecentActions):
             qs = qs.exclude(get_qset(self.exclude_list))
 
         self.children = qs.select_related('content_type', 'user')[:self.limit]
-        #MyLogEntry.current_app=current_app
         for c in self.children:
             c.current_app=current_app
-            #c.get_admin_url=MethodType(MyLogEntry.get_admin_url,c)
             c.get_admin_url=MethodType(get_admin_url,c)
 
         if not len(self.children):
