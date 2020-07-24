@@ -75,8 +75,10 @@ def _ensure_virtualenv():
 
 def _reload_supervisoird(deploy_path, profile):
     template_dir = 'conf'
-    filename = 'dev_supervisord.conf'
+    filename = 'supervisord.conf'
     destination = env.DEPLOY_PATH
+    if not exists(env.DEPLOY_PATH+'/tmp'):
+        run('mkdir -p %s' % env.DEPLOY_PATH+'/tmp')
     context = {
         'process_count': env.PROCESS_COUNT,
         'port_prefix': env.PORT_PREFIX,
@@ -85,9 +87,9 @@ def _reload_supervisoird(deploy_path, profile):
     }
     upload_template(filename, destination, context=context, use_jinja=True, template_dir=template_dir)
     with settings(warn_only=True):
-        result = run('supervisorctl -c %s/dev_supervisord.conf shutdown' % deploy_path)
+        result = run('supervisorctl -c %s/supervisord.conf shutdown' % deploy_path)
         if result:
-            run('supervisord -c %s/dev_supervisord.conf' % deploy_path)
+            run('supervisord -c %s/supervisord.conf' % deploy_path)
 
 
 @task
