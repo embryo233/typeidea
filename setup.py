@@ -10,11 +10,11 @@ setup(
     url='https://www.example.com',
     license='MIT',
 
-    #packages=find_packages('typeidea'),
+    packages=find_packages('typeidea'),
     #等价于
     #packages=['blog', 'typeidea', 'comment', 'config', 'blog.middleware', 'blog.migrations', 'typeidea.settings', 'comment.templatetags', 'comment.migrations', 'config.migrations'],
-
-    #package_dir={'': 'typeidea'},
+    package_dir={'': 'typeidea'},
+    #打包成extra_apps
 
     #只有xadmin，不能共存
     #packages=find_packages('typeidea/extra_apps'),
@@ -22,24 +22,24 @@ setup(
     #packages=['xadmin', 'xadmin.plugins', 'xadmin.templatetags', 'xadmin.views', 'xadmin.migrations'],
     #package_dir={'': 'typeidea/extra_apps'},
 
-    packages=find_packages('typeidea')+find_packages('typeidea/extra_apps'),
+    #packages=find_packages('typeidea')+find_packages('typeidea/extra_apps'),
 
-    package_dir={
-        'xadmin': 'typeidea/extra_apps',
-        'xadmin.plugins': 'typeidea/extra_apps',
-        'xadmin.templatetags': 'typeidea/extra_apps',
-        'xadmin.views': 'typeidea/extra_apps',
-        'xadmin.migrations': 'typeidea/extra_apps',
-        '': 'typeidea',
-        },
+    #package_dir={
+    #    'xadmin': 'typeidea/extra_apps',
+    #    'xadmin.plugins': 'typeidea/extra_apps',
+    #    'xadmin.templatetags': 'typeidea/extra_apps',
+    #    'xadmin.views': 'typeidea/extra_apps',
+    #    'xadmin.migrations': 'typeidea/extra_apps',
+    #    '': 'typeidea',
+    #    },
 
     #下面这条可把extra_apps打包进去
     #packages=['typeidea.extra_apps.xadmin', 'typeidea.extra_apps.xadmin.migrations', 'typeidea.extra_apps.xadmin.plugins', 'typeidea.extra_apps.xadmin.templatetags', 'typeidea.extra_apps.xadmin.views'],
 
-    #暂时通过这样的方法把extra_apps打包进去
+    #可把extra_apps里xadmin里的templates打包进去
     #package_data={'': [    # 打包数据文件，方法一
     #  #'themes/*/*/*/*',  # 需要按目录层级匹配
-    #  '../extra_apps/*/*/*',
+    #  '../extra_apps/*/*/*/*/*',
     #]},
 
     include_package_data=True,  # 方法二 配合 MANIFEST.in文件

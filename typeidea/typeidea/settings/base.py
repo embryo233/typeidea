@@ -17,7 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,os.path.join(os.path.dirname(BASE_DIR),'extra_apps'))
 sys.path.insert(0,os.path.join(BASE_DIR,'extra_apps'))
 
-
+VERSION = '0.1'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -90,9 +90,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
-            'libraries': {  # Adding this section should work around the issue.
-                'staticfiles': 'django.templatetags.static',
-            },
+            #'libraries': {  # Adding this section should work around the issue.
+            #    'staticfiles': 'django.templatetags.static',
+            #},
         },
     },
 ]
