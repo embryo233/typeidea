@@ -2,22 +2,31 @@ from .base import *  # NOQA
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['example.com']
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'typeidea_db',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': '123456',
         'HOST': '127.0.0.1',
         'PORT': 3306,
-        'CONN_MAX_AGE': 5 * 60,
+        'CONN_MAX_AGE': 60,
         'OPTIONS': {'charset': 'utf8mb4'}
-    },
+    }
 }
 
+ADMINS = MANAGERS = (
+    ('abc', 'abc@gmail.com'),  # 你的邮件地址
+)
+
+# EMAIL_HOST = ''
+# EMAIL_HOST_USER = 'the5fire'
+# EMAIL_HOST_PASSWORD = ''
+# EMAIL_SUBJECT_PREFIX = ''
+# DEFAULT_FROM_EMAIL = ''
+# SERVER_EMAIL = ''
+
+STATIC_ROOT = '/root/venvs/typeidea-env/static_files/'
 
 REDIS_URL = '127.0.0.1:6379:1'
 
@@ -32,5 +41,39 @@ CACHES = {
             'PARSER_CLASS': 'redis.connection.HiredisParser',
         },
         'CONNECTION_POOL_CLASS': 'redis.connection.BlockingConnectionPool',
+    }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '%(levelname)s %(asctime)s %(module)s:'
+                      '%(funcName)s:%(lineno)d %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': 'typeidea.log',
+            'formatter': 'default',
+            'maxBytes': 1024 * 1024,  # 1M
+            'backupCount': 5,
+        },
+
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     }
 }

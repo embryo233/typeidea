@@ -7,17 +7,18 @@ from fabric.api import (
 )
 from fabric.contrib.files import exists, upload_template
 from fabric.decorators import task
+from fabric.context_managers import shell_env
 
 
 env.roledefs = {
-    'myserver': ['tt@127.0.0.1'],
+    'myserver': ['root@192.168.11.254'],
 }
 env.PROJECT_NAME = 'typeidea'
 env.SETTINGS_BASE = 'typeidea/typeidea/settings/base.py'
-env.DEPLOY_PATH = '/home/tt/venvs/typeidea-env'
+env.DEPLOY_PATH = '/root/venvs/typeidea-env'
 env.VENV_ACTIVATE = os.path.join(env.DEPLOY_PATH, 'bin', 'activate')
-env.PYPI_HOST = '127.0.0.1'
-env.PYPI_INDEX = 'http://127.0.0.1:18080/simple'
+env.PYPI_HOST = '192.168.11.100'
+env.PYPI_INDEX = 'http://192.168.11.100:18080/simple'
 env.PROCESS_COUNT = 2
 env.PORT_PREFIX = 909
 
@@ -109,4 +110,7 @@ def deploy(version, profile):
             env.PYPI_INDEX,
             env.PYPI_HOST,
         ))
-        _reload_supervisoird(env.DEPLOY_PATH, profile)
+        with shell_env(TYPEIDEA_PROFILE=profile):
+            _reload_supervisoird(env.DEPLOY_PATH, profile)
+            run ('echo yes | %s/bin/manage.py collectstatic' % env.DEPLOY_PATH)
+
