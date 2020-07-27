@@ -112,6 +112,6 @@ def deploy(version, profile):
         ))
         with shell_env(TYPEIDEA_PROFILE=profile):
             pass
-            #_reload_supervisoird(env.DEPLOY_PATH, profile)
-            #run ('echo yes | %s/bin/manage.py collectstatic' % env.DEPLOY_PATH)
+            _reload_supervisoird(env.DEPLOY_PATH, profile)
+            run ('echo yes | %s/bin/manage.py collectstatic' % env.DEPLOY_PATH)
 

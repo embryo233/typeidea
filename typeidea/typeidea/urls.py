@@ -22,6 +22,7 @@ from django.urls import path,re_path,include
 from django.contrib.sitemaps import views as sitemap_views
 from django.conf.urls.static import static
 from django.views.decorators.cache import cache_page
+from django.views.static import serve
 
 from blog.views import (
     post_list,post_detail,
@@ -74,8 +75,11 @@ urlpatterns = [
     #path('api/', include(router.urls)),
 
     path('api/docs/',include_docs_urls(title='typeidea apis')),
-
-    ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    re_path(r'^static/(?P<path>.*)$', serve, {
+        'document_root': settings.STATIC_ROOT,
+    }),
+    ]
+#+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     #import debug_toolbar
