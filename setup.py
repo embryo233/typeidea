@@ -36,7 +36,7 @@ setup(
         'Pillow==7.2.0',
         'coreapi==2.3.3',
         'django-redis==4.12.1',
-        #'hiredis==0.2.0',
+        'hiredis==1.1.0',
         # debug
         'django-debug-toolbar==2.2',
         'djdt_flamegraph',
