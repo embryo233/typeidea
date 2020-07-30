@@ -1,26 +1,71 @@
 import os
 from datetime import datetime
 
-from fabric.api import (
-    env, run, prefix, local, settings,
-    roles,
-)
-from fabric.contrib.files import exists, upload_template
-from fabric.decorators import task
-from fabric.context_managers import shell_env
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+#from invoke import task
+from fabric import task
+
+PROJECT_NAME = 'typeidea'
+SETTINGS_BASE = 'typeidea/typeidea/settings/base.py'
+DEPLOY_PATH = '/root/venvs/typeidea-env'
+VENV_ACTIVATE = os.path.join(DEPLOY_PATH, 'bin', 'activate')
+PYPI_HOST = '192.168.11.100'
+PYPI_INDEX = 'http://192.168.11.100:18080/simple'
+PROCESS_COUNT = 2
+PORT_PREFIX = 909
 
 
-env.roledefs = {
-    'myserver': ['root@192.168.11.254'],
-}
-env.PROJECT_NAME = 'typeidea'
-env.SETTINGS_BASE = 'typeidea/typeidea/settings/base.py'
-env.DEPLOY_PATH = '/root/venvs/typeidea-env'
-env.VENV_ACTIVATE = os.path.join(env.DEPLOY_PATH, 'bin', 'activate')
-env.PYPI_HOST = '192.168.11.100'
-env.PYPI_INDEX = 'http://192.168.11.100:18080/simple'
-env.PROCESS_COUNT = 2
-env.PORT_PREFIX = 909
+@task
+def build(c, version=None, bytescode=False):
+    """ 本地打包并且上传包到pypi上
+        1. 配置版本号
+        2. 打包并上传
+    Usage:
+        fab build --version 1.4
+    """
+    if not version:
+        version = datetime.now().strftime('%m%d%H%M%S')  # 当前时间，月日时分秒
+
+    _version = _Version()
+    _version.set(['setup.py', SETTINGS_BASE], version)
+
+    result = c.run('echo $SHELL', hide=True)
+    user_shell = result.stdout.strip('\n')
+    c.run('python3 setup.py bdist_wheel upload -r internal', warn=True, shell=user_shell)
+
+
+    _version.revert()
+
+import getpass
+prompt = "Enter login password for use with SSH auth: "
+
+@task
+def deploy(c, version, profile):
+    """ 部署指定版本
+        1. 确认虚拟环境已经配置
+        2. 激活虚拟环境
+        3. 安装软件包
+        4. 启动
+
+    Usage:
+        fab -H myserver -S ssh_config deploy 1.4 product
+    """
+    #c.connect_kwargs={'password': getpass.getpass(prompt)}
+    #c.connect_kwargs["password"] = getpass.getpass(prompt)
+    c.inline_ssh_env=True
+    c.config.run.env={'TYPEIDEA_PROFILE':profile}
+    _ensure_virtualenv(c)
+    package_name = PROJECT_NAME + '==' + version
+    with c.prefix('source %s' % VENV_ACTIVATE):
+        c.run('pip install %s -i %s --trusted-host %s' % (
+            package_name,
+            PYPI_INDEX,
+            PYPI_HOST,
+        ))
+
+        c.run ('echo yes | %s/bin/manage.py collectstatic' % DEPLOY_PATH)
+        _reload_supervisoird(c, DEPLOY_PATH, profile)
+
 
 
 class _Version:
@@ -46,72 +91,39 @@ class _Version:
                 fd.write(content)
 
 
-@task
-def build(version=None):
-    """ 本地打包并且上传包到pypi上
-        1. 配置版本号
-        2. 打包并上传
-    """
-    if not version:
-        version = datetime.now().strftime('%m%d%H%M%S')  # 当前时间，月日时分秒
-
-    _version = _Version()
-    _version.set(['setup.py', env.SETTINGS_BASE], version)
-
-    with settings(warn_only=True):
-        local('python setup.py bdist_wheel upload -r internal')
-
-    _version.revert()
-
-
-def _ensure_virtualenv():
-    if exists(env.VENV_ACTIVATE):
+def _ensure_virtualenv(c):
+    if c.run('test -f %s' % VENV_ACTIVATE, warn=True).ok:
         return True
 
-    if not exists(env.DEPLOY_PATH):
-        run('mkdir -p %s' % env.DEPLOY_PATH)
+    if c.run('test -f %s' % DEPLOY_PATH, warn=True).failed:
+        c.run('mkdir -p %s' % DEPLOY_PATH)
 
-    run('python3 -m venv %s' % env.DEPLOY_PATH)
+    c.run('python3 -m venv %s' % DEPLOY_PATH)
+    c.run('mkdir -p %s/tmp' % DEPLOY_PATH)  # 创建tmp目录存放pid和log
 
 
-def _reload_supervisoird(deploy_path, profile):
-    template_dir = 'conf'
-    filename = 'supervisord.conf'
-    destination = env.DEPLOY_PATH
-    if not exists(env.DEPLOY_PATH+'/tmp'):
-        run('mkdir -p %s' % env.DEPLOY_PATH+'/tmp')
+def _upload_conf(c, deploy_path, profile):
+    env = Environment(
+        loader=FileSystemLoader('conf'),
+        autoescape=select_autoescape(['.conf'])
+    )
+    template = env.get_template('supervisord.conf')
     context = {
-        'process_count': env.PROCESS_COUNT,
-        'port_prefix': env.PORT_PREFIX,
+        'process_count': PROCESS_COUNT,
+        'port_prefix': PORT_PREFIX,
         'profile': profile,
         'deploy_path': deploy_path,
     }
-    upload_template(filename, destination, context=context, use_jinja=True, template_dir=template_dir)
-    with settings(warn_only=True):
-        result = run('supervisorctl -c %s/supervisord.conf shutdown' % deploy_path)
-        if result:
-            run('supervisord -c %s/supervisord.conf' % deploy_path)
+    content = template.render(**context)
+    tmp_file = '/tmp/supervisord.conf'
+    with open(tmp_file, 'wb') as f:
+        f.write(content.encode('utf-8'))
+
+    destination = os.path.join(deploy_path, 'supervisord.conf')
+    c.put(tmp_file, destination)
 
 
-@task
-@roles('myserver')
-def deploy(version, profile):
-    """ 部署指定版本
-        1. 确认虚拟环境已经配置
-        2. 激活虚拟环境
-        3. 安装软件包
-        4. 启动
-    """
-    _ensure_virtualenv()
-    package_name = env.PROJECT_NAME + '==' + version
-    with prefix('source %s' % env.VENV_ACTIVATE):
-        run('pip install %s -i %s --trusted-host %s' % (
-            package_name,
-            env.PYPI_INDEX,
-            env.PYPI_HOST,
-        ))
-        with shell_env(TYPEIDEA_PROFILE=profile):
-            pass
-            _reload_supervisoird(env.DEPLOY_PATH, profile)
-            run ('echo yes | %s/bin/manage.py collectstatic' % env.DEPLOY_PATH)
-
+def _reload_supervisoird(c, deploy_path, profile):
+    _upload_conf(c, deploy_path, profile)
+    c.run('supervisorctl -c %s/supervisord.conf shutdown' % deploy_path, warn=True)
+    c.run('supervisord -c %s/supervisord.conf' % deploy_path)

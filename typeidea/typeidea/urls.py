@@ -75,8 +75,12 @@ urlpatterns = [
     #path('api/', include(router.urls)),
 
     path('api/docs/',include_docs_urls(title='typeidea apis')),
-    re_path(r'^static/(?P<path>.*)$', serve, {
+
+    re_path(r'^static/(?P<path>.*)$',serve,{
         'document_root': settings.STATIC_ROOT,
+    }),
+    re_path(r'^media/(?P<path>.*)$', serve, {
+        'document_root': settings.MEDIA_ROOT,
     }),
     ]
 #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
