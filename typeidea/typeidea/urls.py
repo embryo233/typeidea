@@ -30,7 +30,7 @@ from blog.views import (
     PostDetailView,SearchView,AuthorView,
 )
 from config.views import LinkListView
-from comment.views import CommentView
+from comment.views import CommentView,VerifyCaptcha
 from .custom_site import custom_site
 from blog.rss import LatestPostFeed
 from blog.sitemap import PostSitemap
@@ -82,6 +82,8 @@ urlpatterns = [
     re_path(r'^media/(?P<path>.*)$', serve, {
         'document_root': settings.MEDIA_ROOT,
     }),
+    path('captcha/',include('captcha.urls')),
+    path('verify_captcha/', VerifyCaptcha.as_view(), name='verify_captcha'),
     ]
 #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
@@ -91,3 +93,4 @@ if settings.DEBUG:
         #path('__debug__/', include(debug_toolbar.urls)),
         path('silk/', include('silk.urls',namespace='silk')),
     ] + urlpatterns
+
