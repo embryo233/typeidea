@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     'config.apps.ConfigConfig',
     'comment.apps.CommentConfig',
 
+    'captcha',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
