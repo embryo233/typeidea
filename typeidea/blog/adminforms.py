@@ -15,14 +15,13 @@ class PostAdminForm(forms.ModelForm):
         model = Post
         fields = (
             'category', 
-            #'tag', 
+            'tag', 
             'desc', 'title',
             'is_md', 'content', 'content_md', 'content_ck',
             'status'
         )
 
     def __init__(self, *args, **kwargs):
-        #initial = initial or {}
         initial = kwargs.get('initial') or {}
         instance = kwargs.get('instance')
         if instance:
@@ -30,7 +29,7 @@ class PostAdminForm(forms.ModelForm):
                 initial['content_md'] = instance.content
             else:
                 initial['content_ck'] = instance.content
-
+        kwargs.update({'instance':instance,'initial':initial})
         super().__init__(*args,**kwargs)
 
     def clean(self):

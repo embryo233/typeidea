@@ -106,6 +106,17 @@ class PostDetailView(CommonViewMixin,DetailView):
         self.handle_visited()
         return response
 
+    def get_object(self,queryset=None):
+        pk=self.kwargs.get(self.pk_url_kwarg)
+        key='detail:{}'.format(pk)
+        print(key)
+        obj=cache.get(key)
+        if not obj:
+            print('hit db')
+            obj=super().get_object(queryset)
+            cache.set(key,obj,60*5)
+        return obj
+
     def handle_visited(self):
         increase_pv = False
         increase_uv = False
