@@ -210,3 +210,5 @@ ADMIN_TOOLS_MENU = {
     'typeidea.custom_site.custom_site': 'typeidea.admin_menu.CustomMenu',
 }
 
+DETAIL_CACHE_KEY='detail:{}'
+FIVE_MINUTE= 5 * 60

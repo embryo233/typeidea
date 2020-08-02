@@ -6,6 +6,12 @@ from django.core.cache import cache
 from django.db import models
 from django.db.models import Avg,Max,Min,Count,Sum  #   引入函数
 
+from django.conf import settings
+from django.core.cache import cache
+from django.db.models.signals import pre_save,post_save
+from django.dispatch import receiver,Signal
+
+post_markdown=Signal(providing_args=['content','content_html'])
 
 class Category(models.Model):
     STATUS_NORMAL = 1
@@ -153,3 +159,19 @@ class Post(models.Model):
     def tags(self):
         return ','.join(self.tag.values_list('name',flat=True))
     tags.short_description='标签'
+
+@receiver(pre_save,sender=Post)
+def delete_detail_cache(sender,instance=None,**kwargs):
+    key=settings.DETAIL_CACHE_KEY.format(str(instance.id))
+    cache.delete(key)
+    print('delete',key)
+
+@receiver(post_save,sender=Post)
+def reset_detail_cache(sender,instance=None,**kwargs):
+    key=settings.DETAIL_CACHE_KEY.format(str(instance.id))
+    cache.set(key,instance,settings.FIVE_MINUTE)
+    print('reset',key)
+
+@receiver(post_markdown,sender=Post)
+def post_markdown_callback(sender,instance=None,**kwargs):
+    print('after markdown')
