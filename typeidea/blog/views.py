@@ -1,9 +1,10 @@
 from datetime import date
 
+from django.utils import timezone
 from django.http import HttpResponse
 from django.shortcuts import render,get_object_or_404
 from django.views.generic import DetailView,ListView
-from django.db.models import Q,F
+from django.db.models import Q,F,Case, IntegerField, Value, When
 from django.core.cache import cache
 
 from .models import Post,Tag,Category
@@ -23,7 +24,23 @@ class CommonViewMixin:
         return SideBar.objects.filter(status=SideBar.STATUS_SHOW);
 
 class IndexView(CommonViewMixin,ListView):
-    queryset=Post.latest_posts()
+    #queryset=Post.latest_posts().annotate(
+    #    top=Case(
+    #        When(topped_expired_time__lt=timezone.now(),is_top=True,then=Value(0)),
+    #        default=Value(1),
+    #        output_field=IntegerField(),
+    #        ), 
+    #).order_by('-top','-is_top','-id')
+    #或者
+    queryset=Post.latest_posts().annotate(
+        top=Case(
+            When(topped_expired_time__lt=timezone.now(),is_top=True,then=Value(0)),
+            When(is_top=False,then=Value(1)),
+            default=Value(2),
+            output_field=IntegerField(),
+            ), 
+    ).order_by('-top','-id')
+
     paginate_by=5
     context_object_name='post_list'
     template_name='blog/list.html'

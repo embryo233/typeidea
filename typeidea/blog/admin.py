@@ -68,7 +68,8 @@ class PostAdmin(BaseOwnerAdmin):
     form=PostAdminForm
     list_display=[
         'title','category','tags','status',
-        'created_time','owner','operator'
+        'created_time','owner','operator',
+        'is_top','topped_expired_time',
     ]
     list_display_links=[]
 
@@ -112,6 +113,10 @@ class PostAdmin(BaseOwnerAdmin):
         ('额外信息', {
             'classes': ('wide',),
             'fields': ('tag', ),
+        }),
+        ('置顶相关', {
+            'classes': ('wide',),
+            'fields': ('is_top','topped_expired_time', ),
         })
     )
 

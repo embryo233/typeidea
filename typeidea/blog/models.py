@@ -1,5 +1,5 @@
 from mistune import markdown
-
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.contrib.auth.models import User
 from django.core.cache import cache
@@ -101,9 +101,12 @@ class Post(models.Model):
     pv = models.PositiveIntegerField(default=1)
     uv = models.PositiveIntegerField(default=1)
 
+    is_top=models.BooleanField(default=False,verbose_name='置顶')
+    topped_expired_time=models.DateTimeField(default=timezone.now,verbose_name='置顶失效时间')
+
     class Meta:
         verbose_name = verbose_name_plural = "文章"
-        ordering = ['-id']
+        ordering = ['-is_top','-id']
 
     def __str__(self):
         return self.title
