@@ -76,6 +76,16 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+class Top(models.Model):
+    is_top=models.BooleanField(default=False,verbose_name='置顶')
+    topped_expired_time=models.DateTimeField(default=timezone.now,verbose_name='置顶失效时间')
+
+    class Meta:
+        verbose_name = verbose_name_plural = '置顶'
+
+    def __str__(self):
+        return '置顶' if self.is_top else '不置顶'
+
 
 class Post(models.Model):
     STATUS_NORMAL = 1
@@ -95,18 +105,16 @@ class Post(models.Model):
     is_md = models.BooleanField(default=False, verbose_name="markdown语法")
     category = models.ForeignKey(Category, verbose_name="分类", on_delete=models.DO_NOTHING)
     tag = models.ManyToManyField(Tag, verbose_name="标签")
+    top= models.OneToOneField(Top, verbose_name="置顶", on_delete=models.CASCADE,null=True,blank=True)
     owner = models.ForeignKey(User, verbose_name="作者", on_delete=models.DO_NOTHING)
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
     pv = models.PositiveIntegerField(default=1)
     uv = models.PositiveIntegerField(default=1)
 
-    is_top=models.BooleanField(default=False,verbose_name='置顶')
-    topped_expired_time=models.DateTimeField(default=timezone.now,verbose_name='置顶失效时间')
-
     class Meta:
         verbose_name = verbose_name_plural = "文章"
-        ordering = ['-is_top','-id']
+        ordering = ['-id']
 
     def __str__(self):
         return self.title
@@ -162,6 +170,7 @@ class Post(models.Model):
     def tags(self):
         return ','.join(self.tag.values_list('name',flat=True))
     tags.short_description='标签'
+
 
 @receiver(pre_save,sender=Post)
 def delete_detail_cache(sender,instance=None,**kwargs):

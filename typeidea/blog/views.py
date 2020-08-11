@@ -24,6 +24,13 @@ class CommonViewMixin:
         return SideBar.objects.filter(status=SideBar.STATUS_SHOW);
 
 class IndexView(CommonViewMixin,ListView):
+    #queryset=Post.latest_posts()
+    #非外键
+
+    '''
+    确定置顶 日期未失效2
+    不置顶 （日期失效/未失效）/确定置顶 日期失效 0
+    '''
     #queryset=Post.latest_posts().annotate(
     #    top=Case(
     #        When(topped_expired_time__lt=timezone.now(),is_top=True,then=Value(0)),
@@ -31,16 +38,49 @@ class IndexView(CommonViewMixin,ListView):
     #        output_field=IntegerField(),
     #        ), 
     #).order_by('-top','-is_top','-id')
-    #或者
+
+    '''
+    确定置顶 日期未失效2
+    不置顶 （日期失效/未失效）1
+    确定置顶 日期失效 0
+    '''
+    #queryset=Post.latest_posts().annotate(
+    #    top=Case(
+    #        When(topped_expired_time__lt=timezone.now(),is_top=True,then=Value(0)),
+    #        When(is_top=False,then=Value(1)),
+    #        default=Value(2),
+    #        output_field=IntegerField(),
+    #        ), 
+    #).order_by('-top','-id')
+
+    #外键形式
+    '''
+    确定置顶 日期未失效2
+    不置顶 （日期失效/未失效）/确定置顶 日期失效 / top外键为Null 0
+    '''
+    #queryset=Post.latest_posts().annotate(
+    #    toptop=Case(
+    #        When(top__topped_expired_time__lt=timezone.now(),top__is_top=True,then=Value(0)),
+    #        default=Value(1),
+    #        output_field=IntegerField(),
+    #        ), 
+    #).order_by('-toptop','-top','-id')
+
+    '''
+    确定置顶 日期未失效 2
+    不置顶 （日期失效/未失效）/top外键为Null 1
+    确定置顶 日期失效 0
+    '''
     queryset=Post.latest_posts().annotate(
-        top=Case(
-            When(topped_expired_time__lt=timezone.now(),is_top=True,then=Value(0)),
-            When(is_top=False,then=Value(1)),
+        toptop=Case(
+            When(top__topped_expired_time__lt=timezone.now(),top__is_top=True,then=Value(0)),
+            When(Q(top__is_top=False)|Q(top__isnull=True),then=Value(1)),
             default=Value(2),
             output_field=IntegerField(),
             ), 
-    ).order_by('-top','-id')
+    ).order_by('-toptop','-id')
 
+    print(queryset.query)
     paginate_by=5
     context_object_name='post_list'
     template_name='blog/list.html'

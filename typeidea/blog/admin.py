@@ -2,8 +2,9 @@ from django.contrib.admin.models import LogEntry
 from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
+from django.db.models import Q
 
-from .models import Post,Category,Tag
+from .models import Post,Category,Tag,Top
 from .adminforms import PostAdminForm
 
 from typeidea.base_admin import BaseOwnerAdmin
@@ -15,6 +16,12 @@ class PostInline(admin.TabularInline):
     extra=3
     model=Post
 
+@admin.register(Top,site=custom_site)
+class TopAdmin(admin.ModelAdmin):
+    list_display=('is_top','topped_expired_time')
+    fields=('is_top','topped_expired_time')
+
+   
 @admin.register(Category,site=custom_site)
 class CategoryAdmin(BaseOwnerAdmin):
     inlines=[PostInline,]
@@ -31,6 +38,28 @@ class TagAdmin(BaseOwnerAdmin):
     list_display=('name','status','created_time')
     fields=('name','status')
     search_fields = ('name', 'id')
+
+class TopOwnerFilter(admin.SimpleListFilter):
+    ''' 自定义过滤器只展示当前文章置顶'''
+
+    title='置顶过滤器'
+    parameter_name='post_top'
+
+    def lookups(self,request,model_admin):
+        #return Category.objects.filter(owner=request.user).values_list('id','name')
+        #return Post.objects.filter(owner=request.user).values_list('top__id','top__is_top').order_by('top').distinct()
+
+        return [(0, False), (1, True)]
+
+    def queryset(self,request,queryset):
+        is_top=self.value()
+        if is_top:
+            #查询置顶设置为空或置顶外键为Null
+            if is_top=='0':
+                return queryset.filter(Q(top__is_top=self.value())|Q(top__isnull=True))
+            else:
+                return queryset.filter(top__is_top=self.value())
+        return queryset
 
 class CategoryOwnerFilter(admin.SimpleListFilter):
     ''' 自定义过滤器只展示当前用户分类 '''
@@ -49,7 +78,7 @@ class CategoryOwnerFilter(admin.SimpleListFilter):
         return queryset
 
 class TagOwnerFilter(admin.SimpleListFilter):
-    ''' 自定义过滤器只展示当前用户分类 '''
+    ''' 自定义过滤器只展示当前用户标签'''
 
     title='标签过滤器'
     parameter_name='owner_tag'
@@ -69,11 +98,12 @@ class PostAdmin(BaseOwnerAdmin):
     list_display=[
         'title','category','tags','status',
         'created_time','owner','operator',
-        'is_top','topped_expired_time',
+        'top',
+        #'top__is_top','top__topped_expired_time',
     ]
     list_display_links=[]
 
-    list_filter=[CategoryOwnerFilter,TagOwnerFilter]
+    list_filter=[CategoryOwnerFilter,TagOwnerFilter,TopOwnerFilter]
     autocomplete_fields = ['category','tag']
     search_fields=['title','category__name','tag__name']
 
@@ -115,8 +145,8 @@ class PostAdmin(BaseOwnerAdmin):
             'fields': ('tag', ),
         }),
         ('置顶相关', {
-            'classes': ('wide',),
-            'fields': ('is_top','topped_expired_time', ),
+            'fields': ('top', ),
+            #'fields': ('top__is_top','top__topped_expired_time', ),
         })
     )
 

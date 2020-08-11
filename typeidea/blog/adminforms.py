@@ -2,7 +2,7 @@ from django import forms
 
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
-from .models import Category, Tag, Post
+from .models import Category, Tag, Post,Top
 
 class PostAdminForm(forms.ModelForm):
     desc=forms.CharField(widget=forms.Textarea,label='摘要',required=False)
@@ -33,6 +33,8 @@ class PostAdminForm(forms.ModelForm):
 
         kwargs.update({'instance':instance,'initial':initial})
         super().__init__(*args,**kwargs)
+        #置顶外键只显示当前文章的置顶
+        self.fields['top'].queryset = Top.objects.filter(post=self.instance)
 
     def clean(self):
         is_md = self.cleaned_data.get('is_md')
