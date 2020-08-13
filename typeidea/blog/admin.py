@@ -68,7 +68,7 @@ class PostAdmin(BaseOwnerAdmin):
     form=PostAdminForm
     list_display=[
         'title','category','tags','status',
-        'created_time','owner','operator'
+        'created_time','owner','operator','is_top',
     ]
     list_display_links=[]
 
@@ -95,8 +95,8 @@ class PostAdmin(BaseOwnerAdmin):
         ('基础配置', {
             'description': '基础配置描述',
             'fields': (
-                ('title', 'category'),
-                'status',
+                ('title', 'category',
+                'status','is_top')
             ),
         }),
         ('内容', {
@@ -112,7 +112,7 @@ class PostAdmin(BaseOwnerAdmin):
         ('额外信息', {
             'classes': ('wide',),
             'fields': ('tag', ),
-        })
+        }),
     )
 
     filter_horizontal = ('tag', )

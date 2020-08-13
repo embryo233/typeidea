@@ -86,7 +86,7 @@ class PostAdmin(BaseOwnerAdmin):
     form=PostAdminForm
     list_display=[
         'title','category','tag','status',
-        'created_time','owner','operator'
+        'created_time','owner','operator','is_top',
     ]
     
     list_display_links=[]
@@ -125,7 +125,7 @@ class PostAdmin(BaseOwnerAdmin):
             '基础信息',
             Row("title", "category"),
             'status',
-            'tag',
+            'tag','is_top',
         ),
         Fieldset(
             '内容信息',

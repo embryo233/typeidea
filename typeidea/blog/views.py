@@ -63,8 +63,17 @@ class CommonViewMixin:
 
         return sidebars;
 
-class IndexView(CommonViewMixin,ListView):
-    queryset=Post.latest_posts()
+class TopViewMixin:
+    def get_context_data(self,**kwargs):
+        context=super().get_context_data(**kwargs)
+        
+        context.update({
+            'topped_posts':Post.get_topped_posts(),
+        })
+        return context
+
+class IndexView(CommonViewMixin,TopViewMixin,ListView):
+    queryset=Post.latest_posts().filter(is_top=False)
     paginate_by=5
     context_object_name='post_list'
     template_name='blog/list.html'

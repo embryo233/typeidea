@@ -97,6 +97,7 @@ class Post(models.Model):
     tag = models.ManyToManyField(Tag, verbose_name="标签")
     owner = models.ForeignKey(User, verbose_name="作者", on_delete=models.DO_NOTHING)
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    is_top=models.BooleanField(default=False,verbose_name="置顶")
 
     pv = models.PositiveIntegerField(default=1)
     uv = models.PositiveIntegerField(default=1)
@@ -157,6 +158,10 @@ class Post(models.Model):
             result = cls.objects.filter(status=cls.STATUS_NORMAL).order_by('-pv').only('id','title')
             cache.set('hot_posts', result, 10 * 60)
         return result
+
+    @classmethod
+    def get_topped_posts(cls):
+        return cls.objects.filter(status=cls.STATUS_NORMAL,is_top=True)
 
     @cached_property
     def tags(self):

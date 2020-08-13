@@ -28,7 +28,7 @@ class PostAdminForm(forms.ModelForm):
         fields = (
             'category', 'tag', 'desc', 'title',
             'is_md', 'content', 'content_md', 'content_ck',
-            'status'
+            'status','is_top',
         )
 
     def __init__(self, instance=None, initial=None, **kwargs):
