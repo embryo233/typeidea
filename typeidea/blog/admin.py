@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.urls import reverse
 from django.utils.html import format_html
 
-from .models import Post,Category,Tag
+from .models import Post,Category,Tag,ToppedPosts
 from .adminforms import PostAdminForm
 
 from typeidea.base_admin import BaseOwnerAdmin
@@ -31,6 +31,12 @@ class TagAdmin(BaseOwnerAdmin):
     list_display=('name','status','created_time')
     fields=('name','status')
     search_fields = ('name', 'id')
+
+@admin.register(ToppedPosts,site=custom_site)
+class TopAdmin(admin.ModelAdmin):
+    list_display=('title','post_id')
+    fields=('title','post_id')
+    search_fields = ('title', 'post_id')
 
 class CategoryOwnerFilter(admin.SimpleListFilter):
     ''' 自定义过滤器只展示当前用户分类 '''

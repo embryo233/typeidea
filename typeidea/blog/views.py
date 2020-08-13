@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.template.loader import render_to_string
 
 
-from .models import Post,Tag,Category
+from .models import Post,Tag,Category,ToppedPosts
 from config.models import SideBar
 # Create your views here.
 
@@ -43,6 +43,7 @@ class CommonViewMixin:
         
         context.update({
             'sidebars':self.get_sidebars(),
+            'topped_posts':ToppedPosts.objects.all(),
         })
         #context.update({
         #    'sidebars':SideBar.get_all(),
@@ -73,7 +74,7 @@ class TopViewMixin:
         return context
 
 class IndexView(CommonViewMixin,TopViewMixin,ListView):
-    queryset=Post.latest_posts().filter(is_top=False)
+    queryset=Post.latest_posts()#.filter(is_top=False)
     paginate_by=5
     context_object_name='post_list'
     template_name='blog/list.html'

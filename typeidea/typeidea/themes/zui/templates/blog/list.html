@@ -12,32 +12,6 @@
 
 
 {% block main %}
-<div class="list">
-  <header>
-    <h3><i class="icon-list-ul"></i> 置顶推荐</h3>
-  </header>
-  <div class="items items-hover">
-  {% for post in topped_posts %}
-        <div class="item">
-          <div class="item-heading">
-            <div class="pull-right label label-danger card-link">分类:<a href="{% url 'category-list' post.category_id %}">{{ post.category.name }}</a></div>
-            <div class="pull-right label label-warning card-link">标签:
-                {% for tag in post.tag.all %}
-                <a href="{% url 'tag-list' tag.id %}">{{ tag.name }}</a>
-                {% endfor %}
-            </div>
-            <h4><a href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h4>
-          </div>
-          <div class="item-content">
-            <div class="text">{{ post.desc }}</div>
-          </div>
-          <div class="item-footer">
-		  <a href="#" class="text-muted"><i class="icon-user"></i>{{post.owner.username}}</a> &nbsp; <span class="text-muted">{{post.created_time}}</span>
-          </div>
-        </div>  
-  {% endfor %}
-</div>
-
     {% for post in post_list %}
     <div class="card post">
         <div class="card-body">

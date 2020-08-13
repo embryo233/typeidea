@@ -44,14 +44,25 @@
             {% endblock %}
             </div>
             <div class="col-xs-3">
+                 <div class="card sidebar">
+                     <div class="card-body">
+                         <h4 class="card-heading card-title">置顶推荐</h4>
+                         <p class="card-content text-muted">
+                             <ul>
+                             {% for topped_post in topped_posts%}
+                             <li><a href="{% url 'post-detail' topped_post.post_id %}">{{ topped_post.title }}</a></li>
+                             {% endfor %}
+                             </ul>
+			 </p>
+                     </div>
+                 </div>
+
                 {% block sidebar %}
                     {% for sidebar in sidebars %}
                     <div class="card sidebar">
                         <div class="card-body">
                             <h4 class="card-heading card-title">{{ sidebar.title }}</h4>
-                            <p class="card-content text-muted">
-                            {{ sidebar.content_html }}
-                            </p>
+                            <p class="card-content text-muted">{{ sidebar.content_html }}</p>
                         </div>
                     </div>
                     {% endfor %}

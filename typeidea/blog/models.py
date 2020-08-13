@@ -76,6 +76,12 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+class ToppedPosts(models.Model):
+    title=models.CharField(max_length=255,verbose_name="标题")
+    post_id=models.PositiveIntegerField(unique=True,verbose_name="关联文章ID")
+
+    class Meta:
+        verbose_name = verbose_name_plural = "置顶文章"
 
 class Post(models.Model):
     STATUS_NORMAL = 1
@@ -178,6 +184,18 @@ def delete_detail_cache(sender,instance=None,**kwargs):
 def reset_detail_cache(sender,instance=None,**kwargs):
     key=settings.DETAIL_CACHE_KEY.format(str(instance.id))
     cache.set(key,instance,settings.FIVE_MINUTE)
+    if instance.is_top:
+        try:
+            topped_post=ToppedPosts.objects.get(post_id=instance.id)
+        except ToppedPosts.DoesNotExist:
+            topped_post=ToppedPosts(title=instance.title,post_id=instance.id)
+            topped_post.save()
+    else:
+        try:
+            topped_post=ToppedPosts.objects.get(post_id=instance.id)
+            topped_post.delete()
+        except ToppedPosts.DoesNotExist:
+            print('不存在')
     print('reset',key)
 
 @receiver(post_markdown,sender=Post)
